@@ -655,7 +655,7 @@ var presetCards =  [
 { id: 'catalog', title: 'Каталоги & поставщики', emoji: '📦', groups: defaultCatalogGroups },
 { id: 'delivery', title: 'Курьеры & доставки', emoji: '🚚', groups: defaultDeliveryGroups },
 { id: 'tools', title: 'Калькуляторы & сервисы', emoji: '🧮', groups: defaultToolsGroups },
-{ id: 'wordoftheday', title: 'Слово дня', emoji: '📖', groups: [], isSpecial: true },
+// { id: 'wordoftheday', title: 'Слово дня', emoji: '📖', groups: [], isSpecial: true },  // ЗАКОММЕНТИРОВАНО - карточка "Слово дня" скрыта
 { id: 'water', title: 'Гидротрекер', emoji: '💧', groups: [], isSpecial: true },
 { id: 'smartnotes', title: 'Мои умные мысли', emoji: '🧠', groups: [], isSpecial: true }
 ];
@@ -668,6 +668,10 @@ if (pc.id === 'vibe') {
 var card = document.createElement('div'); card.className = 'card'; card.setAttribute('data-card-id', 'vibe');
 card.innerHTML = `<div class="card-header"><span class="emoji">🎭</span><h2>Вайб дня:</h2><button class="edit-header-btn" data-card-edit="vibe">✒️</button></div><div class="datetime-section"><div class="greeting-text" id="greetingText">Добрый день</div><div class="vibe-section"><div class="vibe-subtitle" style="font-size:1rem;margin-right:15%;margin-bottom:10px;color:#5c6f87;">✨ сегодня ты</div><div><span class="nickname-display" id="nicknameDisplay">загрузка...</span><button class="refresh-btn" id="refreshNicknameBtn">🔄</button></div><div class="date-hint"><span id="liveDate">----</span> — каждый день новый вайб</div></div></div>`;
 grid.appendChild(card);
+}
+
+/*
+// ========== КАРТОЧКА "СЛОВО ДНЯ" - ЗАКОММЕНТИРОВАНА ==========
 } else if (pc.id === 'wordoftheday') {
     var card = document.createElement('div'); 
     card.className = 'card'; 
@@ -882,8 +886,7 @@ grid.appendChild(card);
         }
     }, 10);
     
-} else if (pc.id === 'water') {
-    
+*/
 } else if (pc.id === 'water') {
 var card = document.createElement('div'); card.className = 'card'; card.setAttribute('data-card-id', 'water');
 card.innerHTML = `<div class="card-header"><span class="emoji">💧</span><h2>Гидротрекер</h2><button class="edit-header-btn" data-card-edit="water">✒️</button></div><div class="water-tracker"><div class="water-stats"><span>💧 Пейте больше воды</span><span id="waterAmountDisplay">0 мл</span></div><div class="progress-bar-bg"><div class="progress-fill" id="waterProgressFill"></div></div><div class="water-controls"><button class="water-btn" data-add="250">➕ 250 мл</button><button class="water-btn" data-add="500">➕ 500 мл</button><button class="water-btn reset-btn" id="resetWaterBtn">🗑 Сброс</button></div><div class="goal-control"><span>🎯 Цель:</span><input type="number" id="waterGoalInput" class="goal-input" value="2000" step="100"><button class="water-btn" id="setWaterGoalBtn">Установить</button></div></div>`;
