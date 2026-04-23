@@ -896,7 +896,7 @@ var card = document.createElement('div'); card.className = 'card'; card.setAttri
 card.innerHTML = `<div class="card-header"><span class="emoji">🧠</span><h2>Мои умные мысли</h2><button class="edit-header-btn" data-card-edit="smartnotes">✒️</button></div><div class="notes-main"><textarea id="quickNotes" class="notes-area" rows="3" placeholder="Главная мысль, идея или план..."></textarea><div id="extraNotesContainer" class="extra-notes-container"></div><div class="note-footer"><button class="add-note-btn" id="addExtraNoteBtn">+ Добавить поле для мыслей</button><span>✍️ автосохранение</span></div></div>`;
 grid.appendChild(card);
 }
-} else {
+ else {
 var dbCard = mainDBMap.get(pc.id);
 var title = dbCard ? dbCard.title : pc.title;
 var emoji = dbCard ? dbCard.emoji : pc.emoji;
@@ -1047,8 +1047,7 @@ setInterval(updateGreetingAndDate, 60000);
 var professions = ["менеджер","работяга","труженик","сотрудник","дизайнер","печатник","сборщик","верстальщик","препресс","фасовщик","упаковщик","манагер","типограф","сувенирщик","фрезеровщик","брошюровщик","резчик","авитолог","клипмейкер","СММщик","логист","курьер","экспедитор","расчётчик","рекламщик","конструктор","лекальщик","продажник","офсетчик","полиграфист","художник","АХОшник","продаван","работник","закупщик","оператор","аккаунт","коллега","товарищ","фотограф","профессионал","продавец","маркетолог","трудяра","лазерщик","термопечатник","плоттерщик","передовик","администратор","мастер"];
 var adjectives = ["яростный","примерный","дружелюбный","занятой","уставший","нервный","улыбчивый","осторожный","отважный","помятый","адекватный","неадекватный","хохочущий","прилежный","застенчивый","продуктивный","отчаянный","креативный","вдохновленный","сонный","бодрый","сосредоточенный","рассеянный","идейный","технаристый","деликатный","отмороженный","суровый","приятный","упакованный","понятливый","игривый","задорный","прошаренный","закалённый","подлеченный","беспристрастный","скиловый","свободный","раскрепощённый","умелый","грозный","прирождённый","работящий","уверенный","находчивый","боевой","раздосадованный","раздраженный","упрямый","мудрый","весёлый","энергичный","спокойный","вдумчивый","быстрый","методичный","безбашенный","продвинутый","озорной"];
 function getRandomNickname() { 
-    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + professions[Math.floor(Math.random() * professions.length)]; 
-}
+    return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + professions[Math.floor(Math.random() * professions.length)]; }
 // ========== YANDEX MODAL ==========
 function showYandexModal() { document.getElementById('yandexModal').classList.add('active'); }
 function closeYandexModal() { document.getElementById('yandexModal').classList.remove('active'); }
