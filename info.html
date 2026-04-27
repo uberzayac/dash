@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Книжная полка - Графикс В</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('assets/stone wall.jpg') center/cover fixed no-repeat;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Светлый полупрозрачный оверлей для более светлого фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.65);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .bookshelf-container {
+            position: relative;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 40px 20px 100px;
+            z-index: 1;
+        }
+
+        .bookshelf {
+            position: relative;
+            width: 1000px;
+            max-width: 100%;
+            height: 650px;
+            background: linear-gradient(180deg, #d4a574 0%, #b8956a 50%, #a68b66 100%);
+            border-radius: 8px;
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.3),
+                inset 0 2px 10px rgba(255,255,255,0.3),
+                inset 0 -2px 10px rgba(0,0,0,0.2);
+            padding: 40px 30px;
+            border: 3px solid #c9a774;
+            background-image:
+                url('assets/wood13.png'),
+                linear-gradient(180deg, #d4a574 0%, #b8956a 50%, #a68b66 100%);
+            background-blend-mode: multiply;
+            background-size: cover;
+        }
+
+        .wood-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 40px,
+                rgba(139, 69, 19, 0.08) 40px,
+                rgba(139, 69, 19, 0.08) 41px
+            );
+            pointer-events: none;
+            border-radius: 8px;
+        }
+
+        .shelf {
+            position: absolute;
+            left: 30px;
+            right: 30px;
+            height: 20px;
+            background: linear-gradient(180deg, #c9a87c 0%, #b8956a 50%, #a08560 100%);
+            box-shadow:
+                0 4px 15px rgba(0,0,0,0.5),
+                inset 0 2px 4px rgba(255,255,255,0.2);
+            border-radius: 3px;
+            border: 2px solid #a68b66;
+            background-image:
+                url('wood-texture.png'),
+                linear-gradient(180deg, #c9a87c 0%, #b8956a 50%, #a08560 100%);
+            background-blend-mode: multiply;
+            background-size: cover;
+            transform: perspective(800px) rotateX(-25deg);
+            transform-origin: bottom center;
+            z-index: 11;
+        }
+
+        .shelf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, #d4b896 0%, #c9a87c 100%);
+            border-radius: 3px;
+            transform: translateZ(1px);
+        }
+
+        .shelf::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: -2px;
+            right: -2px;
+            height: 12px;
+            background: linear-gradient(180deg, #8b7355 0%, #6b5344 100%);
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transform: translateZ(-1px);
+        }
+
+        .shelf-1 { top: 200px; }
+        .shelf-2 { top: 400px; }
+        .shelf-3 { top: 600px; }
+
+        .book {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 6px 15px rgba(0,0,0,0.4));
+            transform: translateY(10px);
+        }
+
+        .book:hover {
+            transform: translateY(-5px) scale(1.3);
+            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+            z-index: 100;
+        }
+
+        .book img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 3px 8px 8px 3px;
+            box-shadow:
+                4px 0 10px rgba(0,0,0,0.3),
+                inset 0 0 15px rgba(255,255,255,0.15);
+        }
+
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            background: linear-gradient(90deg, rgba(0,0,0,0.5), transparent 80%);
+            border-radius: 3px 0 0 3px;
+            z-index: 10;
+        }
+
+        .book-label {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .book:hover .book-label {
+            opacity: 1;
+        }
+
+        .decor {
+            position: absolute;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+            z-index: 5;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        /* Кактус */
+        .cactus {
+            width: 60px;
+            height: 90px;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        .cactus img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .cactus:hover {
+            transform: translateY(-5px) scale(1.02);
+            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+            z-index: 100;
+        }
+        
+        /* Отдельный стиль для лейбла кактуса */
+        .cactus-label {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 200;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .cactus:hover .cactus-label {
+            opacity: 1;
+        }
+
+        .merch-sample {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            padding: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        /* Ручка с поворотом и плавной анимацией */
+        .pen {
+            width: 80px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(251deg);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: center center;
+        }
+        
+        .pen:hover {
+            transform: rotate(285deg);
+        }
+        
+        .pen img {
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        /* Кружка с изображением и паром */
+        .mug {
+            width: 90px;
+            height: auto;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mug img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+        
+        .mug:hover {
+            transform: translateY(-5px);
+            filter: drop-shadow(0 12px 30px rgba(0,0,0,0.5));
+        }
+        
+        /* Пар при наведении */
+        .vapour {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            z-index: 20;
+            padding: 0 5px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            width: 90px;
+            justify-content: center;
+        }
+        
+        .mug:hover .vapour {
+            opacity: 1;
+        }
+        
+        .vapour span {
+            position: relative;
+            display: inline-block;
+            margin: 0 1px;
+            width: 5px;
+            height: 68px;
+            background: rgba(255, 255, 255, 0.7);
+            animation: vapourAnimate 3s linear infinite;
+            animation-delay: calc(var(--i) * -0.3s);
+            filter: blur(6px);
+            border-radius: 50%;
+        }
+        
+        @keyframes vapourAnimate {
+            0% {
+                transform: translateY(0) scaleX(1);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateY(-68px) scaleX(3);
+                opacity: 0.5;
+            }
+            95% {
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(-136px) scaleX(6);
+                opacity: 0;
+            }
+        }
+
+        /* Блокнот */
+        .notebook {
+            width: 90px;
+            height: 113px;
+            background-image: url('assets/notecover.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 3px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.8s ease-in-out;
+            position: relative;
+        }
+        
+        .notebook::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('assets/note.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 3px;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            z-index: 1;
+        }
+        
+        .notebook:hover::before {
+            opacity: 1;
+        }
+        
+        .notebook:hover {
+            background-image: url('assets/notecover.png');
+        }
+
+        /* Позиции элементов */
+        /* ВЕРХНЯЯ ПОЛКА (top: 200px) */
+        .book-1 { 
+            left: 50px; 
+            top: 30px; 
+            width: 200px; 
+            height: 170px; 
+        }
+        
+        .decor-1.cactus {
+            left: 275px;
+            top: 118px;
+        }
+
+        .book-2 { 
+            left: 360px; 
+            top: 40px; 
+            width: 210px; 
+            height: 160px; 
+        }
+
+        .book-3 { 
+            left: 600px; 
+            top: 35px; 
+            width: 200px; 
+            height: 165px; 
+        }
+
+        /* СРЕДНЯЯ ПОЛКА (top: 400px) */
+        .book-4 { 
+            left: 60px; 
+            top: 245px;
+            width: 200px; 
+            height: 150px; 
+        }
+
+        .decor-3.merch-sample {
+            display: none;
+            left: 280px;
+            top: 330px;
+        }
+        
+        .book-5 { 
+            left: 370px; 
+            top: 240px; 
+            width: 180px; 
+            height: 160px; 
+        }
+
+        .decor-4.pen {
+            left: 570px;
+            top: 310px;
+            width: 80px;
+            height: 90px;
+        }
+
+        .book-6 { 
+            left: 650px; 
+            top: 235px; 
+            width: 200px; 
+            height: 165px; 
+        }
+
+        /* НИЖНЯЯ ПОЛКА (top: 600px) */
+        .book-7 { 
+            left: 70px; 
+            top: 430px; 
+            width: 200px; 
+            height: 170px; 
+        }
+
+        .decor-5.mug {
+            left: 250px;
+            top: 485px;
+            width: 90px;
+        }
+        
+        .book-8 { 
+            left: 380px; 
+            top: 440px; 
+            width: 170px; 
+            height: 150px; 
+        }
+
+        .decor-6.notebook {
+            left: 500px;
+            top: 365px;
+            width: 90px;
+            height: 113px;
+        }
+
+        .book-9 { 
+            left: 660px; 
+            top: 435px; 
+            width: 200px; 
+            height: 165px; 
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: white;
+            overflow: hidden;
+            animation: slideIn 0.4s;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 10001;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            color: #2c3e50;
+        }
+
+        .modal-close:hover {
+            background: white;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        .error-message h2 {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        .error-message p {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .error-message a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .error-message .small {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 950px) {
+            .bookshelf {
+                width: 100%;
+                height: auto;
+                min-height: 900px;
+            }
+            .shelf { left: 20px; right: 20px; }
+            .shelf-1 { top: 300px; }
+            .shelf-2 { top: 600px; }
+            .shelf-3 { top: 900px; }
+            
+            .book { 
+                width: 180px !important; 
+                height: 150px !important;
+            }
+            .book-1 { left: 30px; top: 30px; }
+            .decor-1 { left: 230px; top: 218px; }
+            .book-2 { left: 230px; top: 220px; }
+            .book-3 { left: 430px; top: 215px; }
+            
+            .book-4 { left: 30px; top: 330px; }
+            .decor-3 { left: 230px; top: 530px; }
+            .book-5 { left: 230px; top: 320px; }
+            .decor-4 { left: 430px; top: 510px; }
+            .book-6 { left: 430px; top: 315px; }
+            
+            .book-7 { left: 30px; top: 630px; }
+            .decor-5 { left: 200px; top: 785px; width: 90px; }
+            .book-8 { left: 230px; top: 620px; }
+            .decor-6 { left: 400px; top: 665px; width: 90px; height: 113px; }
+            .book-9 { left: 430px; top: 615px; }
+            
+            .header h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Книжная полка ГрафиксВ</h1>
+    </div>
+
+    <div class="bookshelf-container">
+        <div class="bookshelf">
+            <div class="wood-texture"></div>
+            
+            <div class="shelf shelf-1"></div>
+            <div class="shelf shelf-2"></div>
+            <div class="shelf shelf-3"></div>
+
+            <!-- ВЕРХНЯЯ ПОЛКА -->
+            <div class="book book-1" onclick="openFlipbook('https://misc.gv-integration.ru/promo', 'Презентация компании')">
+                <div class="book-spine"></div>
+                <img src="https://gv.gt.tc/promo/1.jpg" alt="Презентация компании">
+                <div class="book-label">Презентация компании</div>
+            </div>
+
+            <div class="decor decor-1 cactus">
+                <img src="assets/cactuspng3.png" alt="Кактус">
+                <div class="cactus-label">Ай!</div>
+            </div>
+
+            <div class="book book-2" onclick="openFlipbook('https://misc.gv-integration.ru/promonew', 'oasis мерч')">
+                <div class="book-spine"></div>
+                <img src="https://gv.gt.tc/promo/1.jpg" alt="Флипбук">
+                <div class="book-label">Флипбук</div>
+            </div>
+
+            <div class="book book-3" onclick="openFlipbook('https://', 'Oasis мерч')">
+                <div class="book-spine"></div>
+                <img src="assets/merch1.png" alt="Корпоративные подарки">
+                <div class="book-label">Корп. подарки</div>
+            </div>
+
+            <!-- СРЕДНЯЯ ПОЛКА -->
+            <div class="book book-4" onclick="openFlipbook('presentation4.html', 'Регламент менеджера')">
+                <div class="book-spine"></div>
+                <img src="assets/reg6.png" alt="Регламент">
+                <div class="book-label">Регламент менеджера</div>
+            </div>
+
+            <div class="decor decor-3 merch-sample">
+                МЕРЧ
+            </div>
+            
+            <div class="book book-5" onclick="openFlipbook('presentation5.html', 'Полиграфия')">
+                <div class="book-spine"></div>
+                <img src="assets/emp.png" alt="Пока пусто2">
+                <div class="book-label">пока пусто</div>
+            </div>
+
+            <div class="decor decor-4 pen">
+                <img src="assets/pen5.png" alt="Ручка">
+            </div>
+            
+            <div class="book book-6" onclick="openFlipbook('presentation6.html', 'Сувениры')">
+                <div class="book-spine"></div>
+                <img src="assets/emp.png" alt="Сувенирная продукция">
+                <div class="book-label">Сувениры</div>
+            </div>
+
+            <!-- НИЖНЯЯ ПОЛКА -->
+            <div class="book book-7" onclick="openFlipbook('presentation7.html', 'Портфолио 2026')">
+                <div class="book-spine"></div>
+                <img src="assets/emp.png" alt="Портфолио 2026">
+                <div class="book-label">Портфолио 2026</div>
+            </div>
+
+            <div class="decor decor-5 mug">
+                <img src="assets/kruzh.png" alt="Кружка">
+                <div class="vapour">
+                    <span style="--i:1;"></span>
+                    <span style="--i:7;"></span>
+                    <span style="--i:2;"></span>
+                    <span style="--i:11;"></span>
+                    <span style="--i:10;"></span>
+                    <span style="--i:14;"></span>
+                    <span style="--i:18;"></span>
+                    <span style="--i:6;"></span>
+                    <span style="--i:19;"></span>
+                    <span style="--i:20;"></span>
+                    <span style="--i:9;"></span>
+                    <span style="--i:16;"></span>
+                    <span style="--i:4;"></span>
+                    <span style="--i:8;"></span>
+                    <span style="--i:13;"></span>
+                    <span style="--i:5;"></span>
+                    <span style="--i:12;"></span>
+                    <span style="--i:17;"></span>
+                    <span style="--i:3;"></span>
+                    <span style="--i:15;"></span>
+                </div>
+            </div>
+            
+            <div class="book book-8" onclick="openFlipbook('presentation8.html', 'Цены и сроки')">
+                <div class="book-spine"></div>
+                <img src="assets/emp.png" alt="Цены и сроки">
+                <div class="book-label">Цены и сроки</div>
+            </div>
+
+            <div class="decor decor-6 notebook">
+            </div>
+
+            <div class="book book-9" onclick="openFlipbook('presentation9.html', 'Контакты')">
+                <div class="book-spine"></div>
+                <img src="assets/emp.png" alt="Контакты">
+                <div class="book-label">Контакты</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <button class="modal-close" onclick="closeFlipbook()">×</button>
+        <div class="modal-content" id="modalContent">
+            <iframe id="flipbookFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        function show404Error(title) {
+            const modalContent = document.getElementById('modalContent');
+            const iframe = document.getElementById('flipbookFrame');
+            
+            iframe.style.display = 'none';
+            
+            let errorDiv = document.getElementById('error404Div');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error404Div';
+                errorDiv.className = 'error-message';
+                errorDiv.innerHTML = `
+                    <h2>404</h2>
+                    <p>Страница не найдена</p>
+                    <p>The page you were looking for could not be found!</p>
+                    <p><small>Knowledge Base: <a href="https://forum.infinityfree.com/docs?topic=49355" target="_blank">https://forum.infinityfree.com/docs?topic=49355</a></small></p>
+                    <p><small>Forum: <a href="https://forum.infinityfree.com" target="_blank">https://forum.infinityfree.com</a></small></p>
+                    <p class="small">Powered by InfinityFree<br>https://www.infinityfree.com</p>
+                `;
+                modalContent.appendChild(errorDiv);
+            } else {
+                errorDiv.style.display = 'flex';
+            }
+            
+            console.log(`Ошибка 404 при открытии: ${title}`);
+        }
+        
+        function hide404Error() {
+            const iframe = document.getElementById('flipbookFrame');
+            const errorDiv = document.getElementById('error404Div');
+            
+            iframe.style.display = 'block';
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        function openFlipbook(url, title) {
+            const modal = document.getElementById('modal');
+            const iframe = document.getElementById('flipbookFrame');
+            
+            hide404Error();
+            iframe.src = '';
+            
+            iframe.onerror = function() {
+                show404Error(title);
+            };
+            
+            const timeoutId = setTimeout(function() {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (doc && doc.body && doc.body.innerHTML.includes('404 Not Found')) {
+                        show404Error(title);
+                    } else if (doc && doc.body && doc.body.innerText.includes('InfinityFree')) {
+                        show404Error(title);
+                    }
+                } catch(e) {
+                    console.log('Cross-origin iframe loaded successfully');
+                }
+            }, 2000);
+            
+            iframe.onload = function() {
+                clearTimeout(timeoutId);
+                setTimeout(() => {
+                    try {
+                        const doc = iframe.contentDocument || iframe.contentWindow.document;
+                        if (doc && doc.body) {
+                            const bodyText = doc.body.innerText || doc.body.textContent;
+                            if (bodyText && (bodyText.includes('404 Not Found') || 
+                                bodyText.includes('The page you were looking for could not be found') ||
+                                bodyText.includes('InfinityFree'))) {
+                                show404Error(title);
+                            }
+                        }
+                    } catch(e) {
+                        console.log('Iframe loaded, cross-origin');
+                    }
+                }, 100);
+            };
+            
+            iframe.src = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            console.log(`Открыта книга: ${title}`);
+        }
+
+        function closeFlipbook() {
+            const modal = document.getElementById('modal');
+            const iframe = document.getElementById('flipbookFrame');
+            
+            modal.classList.remove('active');
+            iframe.src = '';
+            iframe.onload = null;
+            iframe.onerror = null;
+            hide404Error();
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeFlipbook();
+            }
+        });
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFlipbook();
+            }
+        });
+    </script>
+</body>
+</html>
